@@ -3,7 +3,7 @@ Amnesia
 
 Amnesia is a command line tool to clean an AskOmics instance.
 
-The script remove all users files (uploaded files, ttl and results)
+It:
 
 - Remove users files (uploaded files, ttl and results)
 - Delete rdf graphs
