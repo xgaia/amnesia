@@ -1,0 +1,50 @@
+import os
+import glob
+import re
+import shutil
+import argparse
+from libamnesia.DirectoryManager import DirectoryManager
+from libamnesia.SparqlManager import SparqlManager
+from libamnesia.SqlManager import SqlManager
+
+class Amnesia():
+
+    def __init__(self):
+
+        parser = argparse.ArgumentParser(description='Clear AskOmics data')
+
+        parser.add_argument('-d', '--data-dir', type=str, help='AskOmics data directory', default='/tmp/askomics')
+        parser.add_argument('-s', '--sql-file', type=str, help='SQL file', default='/tmp/askomics/database.db')
+        parser.add_argument('-e', '--endpoint', type=str, help='Triplestore endpoint', default='http://localhost:8890/sparql')
+        parser.add_argument('-g', '--user-graph', type=str, help='User graph in the triplestore', default='urn:sparql:askomics:users')
+        parser.add_argument('-p', '--prefix', type=str, help='AskOmics prefix', default='http://www.semanticweb.org/user/ontologies/2018/1#')
+        parser.add_argument('-u', '--triplestore-username', type=str, help='Triplestore admin username', default='dba')
+        parser.add_argument('-w', '--triplestore-password', type=str, help='Triplestore admin password', default='dba')
+
+        self.args = parser.parse_args()
+
+    def main(self):
+        directory_manager = DirectoryManager(self.args.data_dir)
+        # First, remove files
+        directory_manager.get_users_dir()
+        directory_manager.clean_users_dirs()
+
+        # Then, data in virtuoso
+        query_builder = SparqlManager(self.args.endpoint, self.args.triplestore_username, self.args.triplestore_password, self.args.prefix, self.args.user_graph)
+        query_builder.get_data_graphs()
+        print(query_builder.graphs_list)
+        query_builder.drop_graphs()
+        query_builder.drop_metadata()
+
+        # Then, data in sqlite database
+        sql = SqlManager(self.args.sql_file)
+        sql.clean_integrations()
+        sql.clean_queries()
+
+
+if __name__ == '__main__':
+
+    Amnesia().main()
+
+
+
