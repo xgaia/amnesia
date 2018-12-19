@@ -60,7 +60,6 @@ class SparqlManager():
             '''
             DROP SILENT GRAPH <%s>
             ''' % (graph['g'],)) 
-            print(query)
             self.sparql_query(query)
 
         
@@ -72,5 +71,4 @@ class SparqlManager():
             '''
             DELETE WHERE { GRAPH <%s:%s> { <%s> ?p ?o }}
             ''' % (self.user_graph, graph['owner'], graph['g']))
-            print(query)
             self.sparql_query(query)
